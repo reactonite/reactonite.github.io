@@ -1,0 +1,735 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>reactonite.Transpiler &mdash; Reactonite 0.0.1-alpha documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/expand_li.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Reactonite
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1-alpha
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reactonite</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reactonite.html">reactonite package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Constants">reactonite.Constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Helpers">reactonite.Helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.PropsMap">reactonite.PropsMap module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.ReactoniteWatcher">reactonite.ReactoniteWatcher module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Transpiler">reactonite.Transpiler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.main">reactonite.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Reactonite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>reactonite.Transpiler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for reactonite.Transpiler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">distutils.dir_util</span> <span class="kn">import</span> <span class="n">copy_tree</span>
+<span class="kn">from</span> <span class="nn">html.parser</span> <span class="kn">import</span> <span class="n">HTMLParser</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+
+<div class="viewcode-block" id="AttributesParser"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.AttributesParser">[docs]</a><span class="k">class</span> <span class="nc">AttributesParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extends HTMLParser to extract tags with attributes from a given HTML string</span>
+
+<span class="sd">    Call feed method of HTMLParser to generate data and then retriece it from</span>
+<span class="sd">    the object of the class. Here&#39;s an usage example:</span>
+
+<span class="sd">    attributes_parser = AttributesParser()</span>
+<span class="sd">    attributes_parser.feed(&quot;YOUR_HTML_STRING&quot;)</span>
+<span class="sd">    tag_with_attributes = attributes_parser.data</span>
+<span class="sd">    print(tag_with_attributes)</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list</span>
+<span class="sd">        Stores the tags with their attributes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AttributesParser.handle_starttag"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.AttributesParser.handle_starttag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overrides the original handler for start tag and appends the tags to data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tag : str</span>
+<span class="sd">            Name of tag being parsed</span>
+<span class="sd">        attrs : list</span>
+<span class="sd">            List of attrs corresponding to the current tag</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">attrDict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">attrDict</span><span class="p">[</span><span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">attr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="n">tag</span><span class="p">:</span> <span class="n">attrDict</span>
+            <span class="p">})</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[{</span>
+                <span class="n">tag</span><span class="p">:</span> <span class="n">attrDict</span>
+            <span class="p">}]</span></div></div>
+
+
+<div class="viewcode-block" id="ReactCodeMapper"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.ReactCodeMapper">[docs]</a><span class="k">class</span> <span class="nc">ReactCodeMapper</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to convert tags and props from HTML to React</span>
+
+<span class="sd">    Call getReactMap method for converting tags fed for HTML and get</span>
+<span class="sd">    corresponding React Mapping. Here&#39;s an usage example:</span>
+
+<span class="sd">    reactCodeMapper = ReactCodeMapper(destination_dir, props_map)</span>
+<span class="sd">    react_map = reactCodeMapper.getReactMap(tag_with_attributes)</span>
+<span class="sd">    print(react_map)</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    CUSTOM_TAG_HANDLERS : dict</span>
+<span class="sd">        Stores mapping correspoding to tags which are handled seperately.</span>
+<span class="sd">    dest_dir : str</span>
+<span class="sd">        Destination directory for the React codebase.</span>
+<span class="sd">    props_map : dict</span>
+<span class="sd">        Mapping of attrs for HTML to React from props_map.py</span>
+<span class="sd">    add_to_import : list</span>
+<span class="sd">        Stores imports corresponding to variables created during transpilation.</span>
+<span class="sd">    add_variables : list</span>
+<span class="sd">        Stores newly created variables during transpilation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">,</span> <span class="n">props_map</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">dest_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span> <span class="o">=</span> <span class="n">props_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;IMAGE_TAG_HANDLER&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;STYLE_TAG_HANDLER&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;SCRIPT_TAG_HANDLER&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;LINK_TAG_HANDLER&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span><span class="p">,</span>
+            <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">,</span>
+            <span class="s1">&#39;script&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span><span class="p">,</span>
+            <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__getSafeName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates safe name for varibale from path to file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link : str</span>
+<span class="sd">            Path to file for which varibale is created.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Variable name generated from link</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">varName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">link</span><span class="p">:</span>
+            <span class="n">_ch</span> <span class="o">=</span> <span class="n">ch</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+                <span class="n">_ch</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span>
+            <span class="n">varName</span> <span class="o">+=</span> <span class="n">_ch</span>
+        <span class="k">return</span> <span class="n">varName</span>
+
+    <span class="k">def</span> <span class="nf">__getLinkInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates link information.</span>
+
+<span class="sd">        If link is internal corresponding variable name is generated, for</span>
+<span class="sd">        external link it is returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link : str</span>
+<span class="sd">            Link for filepath or external link.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Variable name generated from link or link in external case.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">)):</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getSafeName</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;import </span><span class="si">{var}</span><span class="s2"> from &#39;</span><span class="si">{link}</span><span class="s2">&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">var</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                    <span class="n">link</span><span class="o">=</span><span class="n">link</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">link</span>
+
+    <span class="k">def</span> <span class="nf">__getAttrsWithLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">linkAttr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates attrs for tags having links to other files.</span>
+
+<span class="sd">        If link is internal corresponding variable name is generated, for</span>
+<span class="sd">        external link it is returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attrs : dict</span>
+<span class="sd">            Attributes of tag to be worked upon.</span>
+<span class="sd">        linkAttr : str</span>
+<span class="sd">            Name of attr that correspond to link of file, example &#39;src&#39; in</span>
+<span class="sd">            case of script tag</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Final dictonary of attributes with link handled</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attrKey</span> <span class="o">==</span> <span class="n">linkAttr</span><span class="p">:</span>
+                <span class="n">link_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getLinkInfo</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">])</span>
+                <span class="n">final_attrs</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_info</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">final_attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">final_attrs</span>
+
+    <span class="k">def</span> <span class="nf">__customTagAttrsHandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">tag_handler</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attrs : dict</span>
+<span class="sd">            Attributes for corresponding tag needed to be handled</span>
+<span class="sd">        tag_handler : str</span>
+<span class="sd">            Tag handler type to be used in mapping</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Final attributes for that tag, if None is returned delete the tag</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span><span class="p">:</span>
+            <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;src&#39;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span><span class="p">:</span>
+            <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">final_attrs</span>
+
+    <span class="k">def</span> <span class="nf">__getRenamedAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates renamed attributes correspoding to React.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attrs : dict</span>
+<span class="sd">            Attributes in HTML format</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Attributes in React format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">:</span>
+                <span class="n">useKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">useKey</span> <span class="o">=</span> <span class="n">attrKey</span>
+            <span class="n">final_attrs</span><span class="p">[</span><span class="n">useKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">final_attrs</span>
+
+<div class="viewcode-block" id="ReactCodeMapper.getReactMap"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.ReactCodeMapper.getReactMap">[docs]</a>    <span class="k">def</span> <span class="nf">getReactMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wrapper to generate React Map object comprising of all data needed</span>
+<span class="sd">        to convert HTML to React</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tags : dict</span>
+<span class="sd">            HTML attributes extracted using AttributesParser</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Final mapping of tags with imports and varibles for React, if any</span>
+<span class="sd">            attribute is None then tag needs to be deleted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">final_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;imports&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;variables&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">tag_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getRenamedAttrs</span><span class="p">(</span><span class="n">tag</span><span class="p">[</span><span class="n">tag_name</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span><span class="p">:</span>
+                <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__customTagAttrsHandler</span><span class="p">(</span>
+                    <span class="n">attrs</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="n">final_map</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">tag_name</span><span class="p">:</span> <span class="n">attrs</span><span class="p">})</span>
+        <span class="n">final_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="p">)</span>
+        <span class="n">final_map</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span>
+        <span class="k">return</span> <span class="n">final_map</span></div></div>
+
+
+<div class="viewcode-block" id="Transpiler"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler">[docs]</a><span class="k">class</span> <span class="nc">Transpiler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Transpiler responsible for translating HTML code to React</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    src_dir : str</span>
+<span class="sd">        Path of the source directory within the project directory</span>
+<span class="sd">    dest_dir : str</span>
+<span class="sd">        Path to the transpiled React app within the project directory</span>
+<span class="sd">    parser : str, optional</span>
+<span class="sd">        Specify which parser to use for reading HTML files, defaults</span>
+<span class="sd">        to &quot;html.parser&quot;</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Specify the verbosity of the transpiler, defaults to False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_settings</span><span class="p">,</span>
+                 <span class="n">props_map</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpiler initiator takes config settings and unpacks variables.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        config_settings : dict</span>
+<span class="sd">            Path to src_dir and dest_dir as dict object, stored in config.json</span>
+<span class="sd">        props_map : dict</span>
+<span class="sd">            Mapping of props for HTML to React used during transpilation</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            Specify the verbosity of the transpiler, deafults to False</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Raised if the config_settings point to non existing dirs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;src_dir&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span> <span class="o">=</span> <span class="n">props_map</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Source directory doesn&#39;t exist at &quot;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Destination directory doesn&#39;t exist at &quot;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="s2">&quot;html.parser&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="k">def</span> <span class="nf">__replaceAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">or_attrs</span><span class="p">,</span> <span class="n">f_attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replaces the attrs for updated tags comparing original and final attrs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        soup : BeautifulSoup</span>
+<span class="sd">            bs4.BeautifulSoup passed by reference.</span>
+<span class="sd">        tag_name : str</span>
+<span class="sd">            Name of tag being worked upon.</span>
+<span class="sd">        or_attrs : dict</span>
+<span class="sd">            Dictonary consisting of original attributes of HTML.</span>
+<span class="sd">        f_attrs : dict</span>
+<span class="sd">            Dictonary consisting of final attributes for React.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">or_attrs</span> <span class="o">==</span> <span class="n">f_attrs</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">or_attrs</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">f_attrs</span>
+
+    <span class="k">def</span> <span class="nf">__deleteTag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deletes the tag corresponding to given tag_name and attrs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        soup : BeautifulSoup</span>
+<span class="sd">            bs4.BeautifulSoup passed by reference.</span>
+<span class="sd">        tag_name : str</span>
+<span class="sd">            Name of tag being worked upon.</span>
+<span class="sd">        attrs : dict</span>
+<span class="sd">            Dictonary consisting of original attributes of HTML.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__generateReactFileContent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">function_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates React code from HTML soup object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        soup : BeautifulSoup</span>
+<span class="sd">            bs4.BeautifulSoup with HTML code to be transpiled.</span>
+<span class="sd">        function_name : str</span>
+<span class="sd">            Function name to be used from filename without extension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Content for React file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">attributes_parser</span> <span class="o">=</span> <span class="n">AttributesParser</span><span class="p">()</span>
+        <span class="n">attributes_parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
+        <span class="n">tag_with_attributes</span> <span class="o">=</span> <span class="n">attributes_parser</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="n">reactCodeMapper</span> <span class="o">=</span> <span class="n">ReactCodeMapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">)</span>
+        <span class="n">react_map</span> <span class="o">=</span> <span class="n">reactCodeMapper</span><span class="o">.</span><span class="n">getReactMap</span><span class="p">(</span><span class="n">tag_with_attributes</span><span class="p">)</span>
+
+        <span class="n">final_tags</span> <span class="o">=</span> <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+        <span class="n">react_variables</span> <span class="o">=</span> <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">orignal_tag</span><span class="p">,</span> <span class="n">fianl_tag</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tag_with_attributes</span><span class="p">,</span> <span class="n">final_tags</span><span class="p">):</span>
+            <span class="n">or_tag_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">orignal_tag</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">or_attrs</span> <span class="o">=</span> <span class="n">orignal_tag</span><span class="p">[</span><span class="n">or_tag_name</span><span class="p">]</span>
+            <span class="n">f_tag_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fianl_tag</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">f_attrs</span> <span class="o">=</span> <span class="n">fianl_tag</span><span class="p">[</span><span class="n">f_tag_name</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">or_tag_name</span> <span class="o">==</span> <span class="n">f_tag_name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">f_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__deleteTag</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">or_tag_name</span><span class="p">,</span> <span class="n">or_attrs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__replaceAttrs</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">or_tag_name</span><span class="p">,</span> <span class="n">or_attrs</span><span class="p">,</span> <span class="n">f_attrs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeWarning</span><span class="p">(</span>
+                    <span class="s2">&quot;There&#39;s an error in processing &quot;</span> <span class="o">+</span>
+                    <span class="n">or_tag_name</span>
+                <span class="p">)</span>
+
+        <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Helmet&#39;</span>
+
+        <span class="n">body_contents</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">body_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body_contents</span><span class="p">)</span>
+
+        <span class="n">content_str</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">Helmet</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span> <span class="o">+</span> <span class="n">body_str</span>
+
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">react_variables</span><span class="p">:</span>
+            <span class="n">content_str</span> <span class="o">=</span> <span class="n">content_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="s1">&#39;&quot;{&#39;</span> <span class="o">+</span> <span class="n">variable</span> <span class="o">+</span> <span class="s1">&#39;}&quot;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">variable</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">react_function</span> <span class="o">=</span> <span class="s2">&quot;function &quot;</span> <span class="o">+</span> <span class="n">function_name</span> <span class="o">+</span> <span class="s2">&quot;() {return (&lt;&gt;&quot;</span> <span class="o">+</span> \
+            <span class="n">content_str</span> <span class="o">+</span> <span class="s2">&quot;&lt;/&gt;);}&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        import React from &#39;react&#39;;</span>
+<span class="s2">        import Helmet from &#39;react-helmet&#39;;</span>
+<span class="s2">        </span><span class="si">{imports}</span><span class="s2"></span>
+
+<span class="s2">        </span><span class="si">{function}</span><span class="s2"></span>
+
+<span class="s2">        export default App;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">react_function</span><span class="p">,</span> <span class="n">imports</span><span class="o">=</span><span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__copyStaticFolderToDest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copies source static folder to the transpiled React code static</span>
+<span class="sd">        folder inside src</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">static_src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span>
+        <span class="n">static_dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Copying static folder directory...&#39;</span><span class="p">)</span>
+
+        <span class="n">copy_tree</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">,</span> <span class="n">static_dest_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__transpileFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">is_init_html</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpiles the source HTML file given at the given filepath</span>
+<span class="sd">        to a React code, which is then copied over to the React build</span>
+<span class="sd">        directory</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath : str</span>
+<span class="sd">            Path to the source HTML file which is to be transpiled</span>
+<span class="sd">        is_init_html : bool, optional</span>
+<span class="sd">            Set to True if file to be transpiled is init html file as it will</span>
+<span class="sd">            be renamed to App.js</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Raised if the source html file doesn&#39;t have a .html</span>
+<span class="sd">            extention</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">filenameWithNoExtension</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file_extension</span> <span class="o">!=</span> <span class="s2">&quot;.html&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is not a HTML file&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_init_html</span><span class="p">:</span>
+            <span class="n">filenameWithNoExtension</span> <span class="o">=</span> <span class="s2">&quot;App&quot;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">filenameWithNoExtension</span> <span class="o">+</span> <span class="s2">&quot;.js&quot;</span>
+
+        <span class="n">dest_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Transpiling file &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot; -&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">index</span><span class="p">:</span>
+            <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">file_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generateReactFileContent</span><span class="p">(</span>
+                <span class="n">soup</span><span class="p">,</span>
+                <span class="n">filenameWithNoExtension</span>
+            <span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Transpiler.transpile_project"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpile_project">[docs]</a>    <span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs initial checks like ensuring the source</span>
+<span class="sd">        directories exist, and the source file is present.</span>
+<span class="sd">        After that, copies static files and transpiles the source.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Raised source html file is missing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">entry_point_html</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">entry_point_html</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Entry point file doesn&#39;t exist at &quot;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">entry_point_html</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Copy static assests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copyStaticFolderToDest</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transpiling files...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Next Release, Loop through all files/dirs in src folder except</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__transpileFile</span><span class="p">(</span>
+            <span class="n">entry_point_html</span><span class="p">,</span>
+            <span class="n">is_init_html</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Reactonite
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
