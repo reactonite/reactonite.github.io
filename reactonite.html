@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>reactonite package &mdash; Reactonite 0.0.1-alpha documentation</title>
+  <title>reactonite package &mdash; Reactonite dev documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                0.0.1-alpha
+                dev
               </div>
             
           
@@ -93,6 +93,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">reactonite</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">reactonite package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Config">reactonite.Config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Constants">reactonite.Constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Helpers">reactonite.Helpers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
@@ -177,6 +178,85 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-reactonite.Config">
+<span id="reactonite-config-module"></span><h2>reactonite.Config module<a class="headerlink" href="#module-reactonite.Config" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="reactonite.Config.Config">
+<em class="property">class </em><code class="sig-prename descclassname">reactonite.Config.</code><code class="sig-name descname">Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em>, <em class="sig-param"><span class="n">load</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Class to manage and maintain project configuration.
+One can add/remove/modify config variables and save/load
+it easily</p>
+<dl class="py attribute">
+<dt id="reactonite.Config.Config.config_path">
+<code class="sig-name descname">config_path</code><a class="headerlink" href="#reactonite.Config.Config.config_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to configuration file from where to load/save</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="reactonite.Config.Config.config">
+<code class="sig-name descname">config</code><a class="headerlink" href="#reactonite.Config.Config.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Config settings dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>str</em>) – Path to configuration file from where to load/save</p></li>
+<li><p><strong>load</strong> (<em>bool</em>) – Whether to load config on object creation, default is False</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="reactonite.Config.Config.add_to_config">
+<code class="sig-name descname">add_to_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_name</span></em>, <em class="sig-param"><span class="n">config_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config.add_to_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config.add_to_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds/updates a variable to the config</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Config.Config.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a config variable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Config.Config.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the configuration as a dictionary</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Config.Config.load_config">
+<code class="sig-name descname">load_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the configuration from the config_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – Raised if config file not found at the config_path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Config.Config.save_config">
+<code class="sig-name descname">save_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Config.html#Config.save_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Config.Config.save_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the configuration to the config_path
+in JSoN format. It first creates the file if it
+doesn’t exist, then writes into it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-reactonite.Constants">
 <span id="reactonite-constants-module"></span><h2>reactonite.Constants module<a class="headerlink" href="#module-reactonite.Constants" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -210,6 +290,17 @@
 <dt id="reactonite.Constants.DEFAULTS.DEST_DIR">
 <code class="sig-name descname">DEST_DIR</code><a class="headerlink" href="#reactonite.Constants.DEFAULTS.DEST_DIR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Destination directory for React codebase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="reactonite.Constants.DEFAULTS.STATIC_DIR">
+<code class="sig-name descname">STATIC_DIR</code><a class="headerlink" href="#reactonite.Constants.DEFAULTS.STATIC_DIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static directory for HTML codebase.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -315,13 +406,13 @@ exception if file not exists.</p>
 <span id="reactonite-nodewrapper-module"></span><h2>reactonite.NodeWrapper module<a class="headerlink" href="#module-reactonite.NodeWrapper" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="reactonite.NodeWrapper.NodeWrapper">
-<em class="property">class </em><code class="sig-prename descclassname">reactonite.NodeWrapper.</code><code class="sig-name descname">NodeWrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_name</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">reactonite.NodeWrapper.</code><code class="sig-name descname">NodeWrapper</code><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Node wrapper to execute commands corresponding to node js using python.</p>
 <dl class="py attribute">
-<dt id="reactonite.NodeWrapper.NodeWrapper.app_name">
-<code class="sig-name descname">app_name</code><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.app_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of rectonite app to be created.</p>
+<dt id="reactonite.NodeWrapper.NodeWrapper.npx">
+<code class="sig-name descname">npx</code><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.npx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commandline to be used for npx according to system(Linux, Windows)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -330,13 +421,34 @@ exception if file not exists.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="reactonite.NodeWrapper.NodeWrapper.working_dir">
-<code class="sig-name descname">working_dir</code><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.working_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Directory where the app needs to be generated,by default is “.” which
-implies present working directory.</p>
+<dt id="reactonite.NodeWrapper.NodeWrapper.npm">
+<code class="sig-name descname">npm</code><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.npm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commandline to be used for npm according to system(Linux, Windows)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str, optional</p>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="reactonite.NodeWrapper.NodeWrapper.node">
+<code class="sig-name descname">node</code><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commandline to be used for node according to system(Linux, Windows)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.NodeWrapper.NodeWrapper.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an optimized build of your app in the build folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>working_dir</strong> (<em>str</em>) – Directory containing npm project root</p>
 </dd>
 </dl>
 </dd></dl>
@@ -345,8 +457,7 @@ implies present working directory.</p>
 <dt id="reactonite.NodeWrapper.NodeWrapper.check_react_install">
 <code class="sig-name descname">check_react_install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.check_react_install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.check_react_install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks the installation of Nodejs/npm/npx. If npm is not
-available it throws an error and stops the execution of
-the program.</p>
+available it throws an error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>RuntimeError</strong> – Raised if Nodejs/npm/npx is not available.</p>
@@ -356,26 +467,54 @@ the program.</p>
 
 <dl class="py method">
 <dt id="reactonite.NodeWrapper.NodeWrapper.create_react_app">
-<code class="sig-name descname">create_react_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rename_to</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.create_react_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.create_react_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_react_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_name</span></em>, <em class="sig-param"><span class="n">rename_to</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.create_react_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.create_react_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new react app and renames it as specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rename_to</strong> (<em>str</em><em>, </em><em>optional</em>) – Renames the created React app to this, by default None which
-implies same as app name</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – Project name to be used to create the app</p></li>
+<li><p><strong>rename_to</strong> (<em>str</em>) – Renames the created React app to this</p></li>
+<li><p><strong>working_dir</strong> (<em>str</em>) – Working dir to run commands inside</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="reactonite.NodeWrapper.NodeWrapper.install">
-<code class="sig-name descname">install</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">package_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.install" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">install</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">package_name</span></em>, <em class="sig-param"><span class="n">working_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Installs the given package in npm and saves in package.json</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>package_name</strong> (<em>str</em>) – Package to be installed.</p></li>
-<li><p><strong>working_dir</strong> (<em>str</em>) – Directory to execute the command in.</p></li>
+<li><p><strong>working_dir</strong> (<em>str</em>) – Directory containing npm project root</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.NodeWrapper.NodeWrapper.prettify">
+<code class="sig-name descname">prettify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.prettify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.prettify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs code formatting using prettier on the given path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Filepath or directory to run prettier on</p></li>
+<li><p><strong>working_dir</strong> (<em>str</em>) – Directory from which command is run</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.NodeWrapper.NodeWrapper.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the command npm start in the given working directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>working_dir</strong> (<em>str</em>) – Directory to execute the command in.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -624,9 +763,20 @@ attribute is None then tag needs to be deleted</p>
 
 <dl class="py class">
 <dt id="reactonite.Transpiler.Transpiler">
-<em class="property">class </em><code class="sig-prename descclassname">reactonite.Transpiler.</code><code class="sig-name descname">Transpiler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_settings</span></em>, <em class="sig-param"><span class="n">props_map</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">reactonite.Transpiler.</code><code class="sig-name descname">Transpiler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_settings</span></em>, <em class="sig-param"><span class="n">props_map</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">create_project</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Transpiler responsible for translating HTML code to React</p>
+<dl class="py attribute">
+<dt id="reactonite.Transpiler.Transpiler.project_name">
+<code class="sig-name descname">project_name</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.project_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the project as stored in config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="reactonite.Transpiler.Transpiler.src_dir">
 <code class="sig-name descname">src_dir</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.src_dir" title="Permalink to this definition">¶</a></dt>
@@ -642,6 +792,17 @@ attribute is None then tag needs to be deleted</p>
 <dt id="reactonite.Transpiler.Transpiler.dest_dir">
 <code class="sig-name descname">dest_dir</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.dest_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to the transpiled React app within the project directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="reactonite.Transpiler.Transpiler.static_dir">
+<code class="sig-name descname">static_dir</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.static_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of static dir for HTML directory</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -668,6 +829,37 @@ to “html.parser”</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>bool, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Transpiler.Transpiler.copyStaticFolderToDest">
+<code class="sig-name descname">copyStaticFolderToDest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.copyStaticFolderToDest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.copyStaticFolderToDest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies source static folder to the transpiled React code static
+folder inside src</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.Transpiler.Transpiler.transpileFile">
+<code class="sig-name descname">transpileFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">is_init_html</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpileFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpileFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpiles the source HTML file given at the given filepath
+to a React code, which is then copied over to the React build
+directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – Path to the source HTML file which is to be transpiled</p></li>
+<li><p><strong>is_init_html</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set to True if file to be transpiled is init html file as it will
+be renamed to App.js</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>RuntimeError</strong> – Raised if the source html file doesn’t have a .html
+    extention</p></li>
+<li><p><strong>RuntimeError</strong> – Raised if the source html file is not found</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

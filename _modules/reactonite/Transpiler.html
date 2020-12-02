@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>reactonite.Transpiler &mdash; Reactonite 0.0.1-alpha documentation</title>
+  <title>reactonite.Transpiler &mdash; Reactonite dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.0.1-alpha
+                dev
               </div>
             
           
@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">reactonite</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../reactonite.html">reactonite package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Config">reactonite.Config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Constants">reactonite.Constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Helpers">reactonite.Helpers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
@@ -173,6 +174,8 @@
 <span class="kn">from</span> <span class="nn">html.parser</span> <span class="kn">import</span> <span class="n">HTMLParser</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="kn">from</span> <span class="nn">.NodeWrapper</span> <span class="kn">import</span> <span class="n">NodeWrapper</span>
 
 
 <div class="viewcode-block" id="AttributesParser"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.AttributesParser">[docs]</a><span class="k">class</span> <span class="nc">AttributesParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="p">):</span>
@@ -432,10 +435,14 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
+<span class="sd">    project_name : str</span>
+<span class="sd">        Name of the project as stored in config</span>
 <span class="sd">    src_dir : str</span>
 <span class="sd">        Path of the source directory within the project directory</span>
 <span class="sd">    dest_dir : str</span>
 <span class="sd">        Path to the transpiled React app within the project directory</span>
+<span class="sd">    static_dir : str</span>
+<span class="sd">        Name of static dir for HTML directory</span>
 <span class="sd">    parser : str, optional</span>
 <span class="sd">        Specify which parser to use for reading HTML files, defaults</span>
 <span class="sd">        to &quot;html.parser&quot;</span>
@@ -446,17 +453,21 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">config_settings</span><span class="p">,</span>
                  <span class="n">props_map</span><span class="p">,</span>
-                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">create_project</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Transpiler initiator takes config settings and unpacks variables.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        config_settings : dict</span>
-<span class="sd">            Path to src_dir and dest_dir as dict object, stored in config.json</span>
+<span class="sd">            project_name, src_dir, dest_dir, static_dir as dict object stored</span>
+<span class="sd">            in config.json</span>
 <span class="sd">        props_map : dict</span>
 <span class="sd">            Mapping of props for HTML to React used during transpilation</span>
 <span class="sd">        verbose : bool, optional</span>
 <span class="sd">            Specify the verbosity of the transpiler, deafults to False</span>
+<span class="sd">        create_project : bool, optional</span>
+<span class="sd">            Set to True if create project is calling method, deafults to False</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -464,10 +475,19 @@
 <span class="sd">            Raised if the config_settings point to non existing dirs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;project_name&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;src_dir&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">]</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;static_dir&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span> <span class="o">=</span> <span class="n">props_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="s2">&quot;html.parser&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="k">if</span> <span class="n">create_project</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)</span>
+
+        <span class="n">npm</span> <span class="o">=</span> <span class="n">NodeWrapper</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -476,13 +496,21 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Destination directory doesn&#39;t exist at &quot;</span> <span class="o">+</span>
-                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">create_project</span><span class="p">:</span>
+                <span class="n">project_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">)</span>
+                <span class="n">npm</span><span class="o">.</span><span class="n">create_react_app</span><span class="p">(</span>
+                    <span class="n">project_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span>
+                    <span class="n">working_dir</span><span class="o">=</span><span class="n">project_dir</span><span class="p">,</span>
+                    <span class="n">rename_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">npm</span><span class="o">.</span><span class="n">create_react_app</span><span class="p">(</span>
+                    <span class="n">project_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span>
+                    <span class="n">rename_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span>
+                <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="s2">&quot;html.parser&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+            <span class="c1"># Install NPM packages</span>
+            <span class="n">npm</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="s1">&#39;react-helmet&#39;</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__replaceAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">or_attrs</span><span class="p">,</span> <span class="n">f_attrs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Replaces the attrs for updated tags comparing original and final attrs.</span>
@@ -563,8 +591,10 @@
 
         <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Helmet&#39;</span>
 
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">contents</span>
+
         <span class="n">body_contents</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">contents</span>
         <span class="p">]</span>
         <span class="n">body_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body_contents</span><span class="p">)</span>
 
@@ -589,13 +619,13 @@
 <span class="s2">        export default App;</span>
 <span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">react_function</span><span class="p">,</span> <span class="n">imports</span><span class="o">=</span><span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__copyStaticFolderToDest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Transpiler.copyStaticFolderToDest"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.copyStaticFolderToDest">[docs]</a>    <span class="k">def</span> <span class="nf">copyStaticFolderToDest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Copies source static folder to the transpiled React code static</span>
 <span class="sd">        folder inside src</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">static_src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span>
-        <span class="n">static_dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span>
+        <span class="n">static_src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span><span class="p">)</span>
+        <span class="n">static_dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">):</span>
             <span class="k">return</span>
@@ -603,9 +633,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Copying static folder directory...&#39;</span><span class="p">)</span>
 
-        <span class="n">copy_tree</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">,</span> <span class="n">static_dest_dir</span><span class="p">)</span>
+        <span class="n">copy_tree</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">,</span> <span class="n">static_dest_dir</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__transpileFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">is_init_html</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Transpiler.transpileFile"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpileFile">[docs]</a>    <span class="k">def</span> <span class="nf">transpileFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">is_init_html</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Transpiles the source HTML file given at the given filepath</span>
 <span class="sd">        to a React code, which is then copied over to the React build</span>
 <span class="sd">        directory</span>
@@ -623,6 +653,8 @@
 <span class="sd">        RuntimeError</span>
 <span class="sd">            Raised if the source html file doesn&#39;t have a .html</span>
 <span class="sd">            extention</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Raised if the source html file is not found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
@@ -631,10 +663,18 @@
         <span class="k">if</span> <span class="n">file_extension</span> <span class="o">!=</span> <span class="s2">&quot;.html&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is not a HTML file&#39;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> file not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
         <span class="k">if</span> <span class="n">is_init_html</span><span class="p">:</span>
             <span class="n">filenameWithNoExtension</span> <span class="o">=</span> <span class="s2">&quot;App&quot;</span>
 
         <span class="n">filename</span> <span class="o">=</span> <span class="n">filenameWithNoExtension</span> <span class="o">+</span> <span class="s2">&quot;.js&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Looks like your React project didn&#39;t get </span><span class="se">\</span>
+<span class="s2">                created please check your &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">+</span> <span class="s2">&quot; for a src </span><span class="se">\</span>
+<span class="s2">                    folder&quot;</span><span class="p">)</span>
 
         <span class="n">dest_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
@@ -653,6 +693,8 @@
                 <span class="n">filenameWithNoExtension</span>
             <span class="p">)</span>
             <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span>
+
+        <span class="n">NodeWrapper</span><span class="p">()</span><span class="o">.</span><span class="n">prettify</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">dest_filepath</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Transpiler.transpile_project"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpile_project">[docs]</a>    <span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Runs initial checks like ensuring the source</span>
@@ -674,13 +716,13 @@
             <span class="p">)</span>
 
         <span class="c1"># Copy static assests</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__copyStaticFolderToDest</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copyStaticFolderToDest</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transpiling files...&quot;</span><span class="p">)</span>
 
         <span class="c1"># TODO: Next Release, Loop through all files/dirs in src folder except</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__transpileFile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
             <span class="n">entry_point_html</span><span class="p">,</span>
             <span class="n">is_init_html</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span></div></div>
