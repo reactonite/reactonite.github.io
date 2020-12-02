@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  checkout-branch:
+  fetch-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
