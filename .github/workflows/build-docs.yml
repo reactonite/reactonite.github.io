@@ -15,4 +15,7 @@ jobs:
           persist-credentials: false
       - name: Fetch Docs 🚀
         run: |
-          git status
+          git submodule update --recursive --remote
+          git add .
+          git commit -m "update docs 🚀"
+          git push
