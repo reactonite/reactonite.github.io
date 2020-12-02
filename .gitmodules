@@ -1,0 +1,3 @@
+[submodule "de"]
+	path = dev
+	url = https://github.com/reactonite/reactonite.github.io.git
