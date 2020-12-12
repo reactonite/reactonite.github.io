@@ -298,17 +298,6 @@ doesn’t exist, then writes into it.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="reactonite.Constants.DEFAULTS.STATIC_DIR">
-<code class="sig-name descname">STATIC_DIR</code><a class="headerlink" href="#reactonite.Constants.DEFAULTS.STATIC_DIR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Static directory for HTML codebase.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
 <dt id="reactonite.Constants.DEFAULTS.CONFIG_FILE_NAME">
 <code class="sig-name descname">CONFIG_FILE_NAME</code><a class="headerlink" href="#reactonite.Constants.DEFAULTS.CONFIG_FILE_NAME" title="Permalink to this definition">¶</a></dt>
 <dd><p>Config file name for config variables.</p>
@@ -467,7 +456,7 @@ available it throws an error.</p>
 
 <dl class="py method">
 <dt id="reactonite.NodeWrapper.NodeWrapper.create_react_app">
-<code class="sig-name descname">create_react_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_name</span></em>, <em class="sig-param"><span class="n">rename_to</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.create_react_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.create_react_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_react_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_name</span></em>, <em class="sig-param"><span class="n">rename_to</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.create_react_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.create_react_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new react app and renames it as specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -677,12 +666,12 @@ print(tag_with_attributes)</p>
 
 <dl class="py class">
 <dt id="reactonite.Transpiler.ReactCodeMapper">
-<em class="property">class </em><code class="sig-prename descclassname">reactonite.Transpiler.</code><code class="sig-name descname">ReactCodeMapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dest_dir</span></em>, <em class="sig-param"><span class="n">props_map</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#ReactCodeMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">reactonite.Transpiler.</code><code class="sig-name descname">ReactCodeMapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_dir</span></em>, <em class="sig-param"><span class="n">dest_dir</span></em>, <em class="sig-param"><span class="n">props_map</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#ReactCodeMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to convert tags and props from HTML to React</p>
 <p>Call getReactMap method for converting tags fed for HTML and get
 corresponding React Mapping. Here’s an usage example:</p>
-<p>reactCodeMapper = ReactCodeMapper(destination_dir, props_map)
+<p>reactCodeMapper = ReactCodeMapper(source_dir, destination_dir, props_map)
 react_map = reactCodeMapper.getReactMap(tag_with_attributes)
 print(react_map)</p>
 <dl class="py attribute">
@@ -692,6 +681,17 @@ print(react_map)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="reactonite.Transpiler.ReactCodeMapper.src_dir">
+<code class="sig-name descname">src_dir</code><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper.src_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source directory for the HTML codebase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -740,14 +740,28 @@ print(react_map)</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="reactonite.Transpiler.ReactCodeMapper.router_link_imported">
+<code class="sig-name descname">router_link_imported</code><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper.router_link_imported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves wether Link tag needs to be imported for current page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="reactonite.Transpiler.ReactCodeMapper.getReactMap">
-<code class="sig-name descname">getReactMap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tags</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#ReactCodeMapper.getReactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper.getReactMap" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getReactMap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tags</span></em>, <em class="sig-param"><span class="n">filepath_from_src</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#ReactCodeMapper.getReactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.ReactCodeMapper.getReactMap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper to generate React Map object comprising of all data needed
 to convert HTML to React</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>tags</strong> (<em>dict</em>) – HTML attributes extracted using AttributesParser</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tags</strong> (<em>dict</em>) – HTML attributes extracted using AttributesParser</p></li>
+<li><p><strong>filepath_from_src</strong> (<em>str</em>) – Path to file from src directory</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Final mapping of tags with imports and varibles for React, if any
@@ -800,12 +814,12 @@ attribute is None then tag needs to be deleted</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="reactonite.Transpiler.Transpiler.static_dir">
-<code class="sig-name descname">static_dir</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.static_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of static dir for HTML directory</p>
+<dt id="reactonite.Transpiler.Transpiler.index_routes">
+<code class="sig-name descname">index_routes</code><a class="headerlink" href="#reactonite.Transpiler.Transpiler.index_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores Routes data corresponding to different pages for index.js</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -834,32 +848,17 @@ to “html.parser”</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="reactonite.Transpiler.Transpiler.copyStaticFolderToDest">
-<code class="sig-name descname">copyStaticFolderToDest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.copyStaticFolderToDest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.copyStaticFolderToDest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copies source static folder to the transpiled React code static
-folder inside src</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="reactonite.Transpiler.Transpiler.transpileFile">
-<code class="sig-name descname">transpileFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">is_init_html</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpileFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpileFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transpileFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpileFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpileFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transpiles the source HTML file given at the given filepath
 to a React code, which is then copied over to the React build
-directory</p>
+directory, if not HTML file then get’s copied directly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>str</em>) – Path to the source HTML file which is to be transpiled</p></li>
-<li><p><strong>is_init_html</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set to True if file to be transpiled is init html file as it will
-be renamed to App.js</p></li>
-</ul>
+<dd class="field-odd"><p><strong>filepath</strong> (<em>str</em>) – Path to the source HTML file which is to be transpiled</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>RuntimeError</strong> – Raised if the source html file doesn’t have a .html
-    extention</p></li>
-<li><p><strong>RuntimeError</strong> – Raised if the source html file is not found</p></li>
-</ul>
+<dd class="field-even"><p><strong>RuntimeError</strong> – Raised if the source html file is not found</p>
 </dd>
 </dl>
 </dd></dl>
@@ -869,7 +868,7 @@ be renamed to App.js</p></li>
 <code class="sig-name descname">transpile_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpile_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpile_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs initial checks like ensuring the source
 directories exist, and the source file is present.
-After that, copies static files and transpiles the source.</p>
+After that, copies non html files and transpiles the source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>RuntimeError</strong> – Raised source html file is missing.</p>

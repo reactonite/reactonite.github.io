@@ -169,11 +169,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for reactonite.Transpiler</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">distutils.dir_util</span> <span class="kn">import</span> <span class="n">copy_tree</span>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">distutils.file_util</span> <span class="kn">import</span> <span class="n">copy_file</span>
 <span class="kn">from</span> <span class="nn">html.parser</span> <span class="kn">import</span> <span class="n">HTMLParser</span>
 
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Comment</span>
 
 <span class="kn">from</span> <span class="nn">.NodeWrapper</span> <span class="kn">import</span> <span class="n">NodeWrapper</span>
 
@@ -225,7 +226,7 @@
 <span class="sd">    Call getReactMap method for converting tags fed for HTML and get</span>
 <span class="sd">    corresponding React Mapping. Here&#39;s an usage example:</span>
 
-<span class="sd">    reactCodeMapper = ReactCodeMapper(destination_dir, props_map)</span>
+<span class="sd">    reactCodeMapper = ReactCodeMapper(source_dir, destination_dir, props_map)</span>
 <span class="sd">    react_map = reactCodeMapper.getReactMap(tag_with_attributes)</span>
 <span class="sd">    print(react_map)</span>
 
@@ -233,6 +234,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    CUSTOM_TAG_HANDLERS : dict</span>
 <span class="sd">        Stores mapping correspoding to tags which are handled seperately.</span>
+<span class="sd">    src_dir : str</span>
+<span class="sd">        Source directory for the HTML codebase.</span>
 <span class="sd">    dest_dir : str</span>
 <span class="sd">        Destination directory for the React codebase.</span>
 <span class="sd">    props_map : dict</span>
@@ -241,23 +244,29 @@
 <span class="sd">        Stores imports corresponding to variables created during transpilation.</span>
 <span class="sd">    add_variables : list</span>
 <span class="sd">        Stores newly created variables during transpilation.</span>
+<span class="sd">    router_link_imported : bool, optional</span>
+<span class="sd">        Saves wether Link tag needs to be imported for current page.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">,</span> <span class="n">props_map</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_dir</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">,</span> <span class="n">props_map</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">=</span> <span class="n">src_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">dest_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span> <span class="o">=</span> <span class="n">props_map</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">router_link_imported</span> <span class="o">=</span> <span class="kc">False</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__A_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;A_TAG_HANDLER&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;IMAGE_TAG_HANDLER&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;STYLE_TAG_HANDLER&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;SCRIPT_TAG_HANDLER&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span> <span class="o">=</span> <span class="s2">&quot;STYLE_TAG_HANDLER&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span> <span class="o">=</span> <span class="s1">&#39;LINK_TAG_HANDLER&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__A_TAG_HANDLER</span><span class="p">,</span>
             <span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span><span class="p">,</span>
-            <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">,</span>
             <span class="s1">&#39;script&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span><span class="p">,</span>
+            <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">,</span>
             <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span>
         <span class="p">}</span>
 
@@ -283,7 +292,7 @@
             <span class="n">varName</span> <span class="o">+=</span> <span class="n">_ch</span>
         <span class="k">return</span> <span class="n">varName</span>
 
-    <span class="k">def</span> <span class="nf">__getLinkInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getLinkInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">no_var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates link information.</span>
 
 <span class="sd">        If link is internal corresponding variable name is generated, for</span>
@@ -293,6 +302,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        link : str</span>
 <span class="sd">            Link for filepath or external link.</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src.</span>
+<span class="sd">        no_var : bool, optional</span>
+<span class="sd">            To generate import variable or just import file, default is False</span>
+<span class="sd">            i.e. generate variable</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -300,20 +314,33 @@
 <span class="sd">            Variable name generated from link or link in external case.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">)):</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getSafeName</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="s2">&quot;import </span><span class="si">{var}</span><span class="s2"> from &#39;</span><span class="si">{link}</span><span class="s2">&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">var</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
-                    <span class="n">link</span><span class="o">=</span><span class="n">link</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-            <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">link</span>
+        <span class="k">if</span> <span class="n">link</span><span class="p">:</span>
+            <span class="n">pathToLink</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+            <span class="n">pathToIndexLink</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pathToLink</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pathToLink</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pathToIndexLink</span><span class="p">):</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getSafeName</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">no_var</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;import &#39;</span><span class="si">{link}</span><span class="s2">&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">link</span><span class="o">=</span><span class="n">link</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;import </span><span class="si">{var}</span><span class="s2"> from &#39;</span><span class="si">{link}</span><span class="s2">&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">var</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                            <span class="n">link</span><span class="o">=</span><span class="n">link</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">link</span>
 
-    <span class="k">def</span> <span class="nf">__getAttrsWithLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">linkAttr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getAttrsWithLink</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">linkAttr</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">no_var</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates attrs for tags having links to other files.</span>
 
 <span class="sd">        If link is internal corresponding variable name is generated, for</span>
@@ -326,6 +353,11 @@
 <span class="sd">        linkAttr : str</span>
 <span class="sd">            Name of attr that correspond to link of file, example &#39;src&#39; in</span>
 <span class="sd">            case of script tag</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src directory.</span>
+<span class="sd">        no_var : bool, optional</span>
+<span class="sd">            To generate import variable or just import file, default is False</span>
+<span class="sd">            i.e. generate variable</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -336,13 +368,68 @@
         <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">attrKey</span> <span class="o">==</span> <span class="n">linkAttr</span><span class="p">:</span>
-                <span class="n">link_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getLinkInfo</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">])</span>
-                <span class="n">final_attrs</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_info</span>
+                <span class="n">link_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getLinkInfo</span><span class="p">(</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">],</span>
+                    <span class="n">filepath_from_src</span><span class="p">,</span>
+                    <span class="n">no_var</span><span class="o">=</span><span class="n">no_var</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">link_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="n">final_attrs</span><span class="p">[</span><span class="n">linkAttr</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_info</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">final_attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">final_attrs</span>
 
-    <span class="k">def</span> <span class="nf">__customTagAttrsHandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">tag_handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getAttrsForRouterLink</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates attrs for A tag having links to other files.</span>
+
+<span class="sd">        If link is internal that is checked and also link is generated is</span>
+<span class="sd">        generated, for external link it is returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attrs : dict</span>
+<span class="sd">            Attributes of tag to be worked upon.</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src directory.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Tuple of final dictonary of attributes with link handled and</span>
+<span class="sd">            information about internal link</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">is_internal</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attrKey</span> <span class="o">==</span> <span class="s2">&quot;href&quot;</span><span class="p">:</span>
+                <span class="n">href_info</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
+                <span class="n">pathRef</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">href_info</span>
+                <span class="p">)</span>
+                <span class="n">pathRefIndex</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">href_info</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pathRef</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pathRefIndex</span><span class="p">):</span>
+                    <span class="n">htmlPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filepath_from_src</span><span class="p">,</span> <span class="n">href_info</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">jsPath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">htmlPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+                    <span class="n">jsPath</span> <span class="o">=</span> <span class="n">jsPath</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">jsPath</span> <span class="o">==</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span>
+                        <span class="n">jsPath</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+                    <span class="n">is_internal</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">final_attrs</span><span class="p">[</span><span class="s2">&quot;to&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jsPath</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">final_attrs</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">href_info</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">final_attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">final_attrs</span><span class="p">,</span> <span class="n">is_internal</span>
+
+    <span class="k">def</span> <span class="nf">__customTagAttrsHandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">tag_handler</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Custom tag and attributes handler for parsing attrs from CUSTOM_TAG_HANDLERS</span>
 
 <span class="sd">        Parameters</span>
@@ -351,6 +438,8 @@
 <span class="sd">            Attributes for corresponding tag needed to be handled</span>
 <span class="sd">        tag_handler : str</span>
 <span class="sd">            Tag handler type to be used in mapping</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src directory</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -359,21 +448,43 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span><span class="p">:</span>
-            <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__A_TAG_HANDLER</span><span class="p">:</span>
+            <span class="n">final_attrs</span><span class="p">,</span> <span class="n">is_internal_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsForRouterLink</span><span class="p">(</span>
+                <span class="n">attrs</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_link_imported</span> <span class="ow">and</span> <span class="n">is_internal_link</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s1">&#39;import </span><span class="si">{Link}</span><span class="s1"> from &quot;react-router-dom&quot;;&#39;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">router_link_imported</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__IMAGE_TAG_HANDLER</span><span class="p">:</span>
+            <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span>
+                <span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+            <span class="p">)</span>
         <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SCRIPT_TAG_HANDLER</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;src&#39;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span>
+                <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span>
+                    <span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__STYLE_TAG_HANDLER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="n">tag_handler</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__LINK_TAG_HANDLER</span><span class="p">:</span>
-            <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+            <span class="c1"># css variable was added delete other link tags</span>
+            <span class="k">if</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;rel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;stylesheet&quot;</span><span class="p">:</span>
+                <span class="n">final_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getAttrsWithLink</span><span class="p">(</span>
+                        <span class="n">attrs</span><span class="p">,</span>
+                        <span class="s1">&#39;href&#39;</span><span class="p">,</span>
+                        <span class="n">filepath_from_src</span><span class="p">,</span>
+                        <span class="n">no_var</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">final_attrs</span>
 
-    <span class="k">def</span> <span class="nf">__getRenamedAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Generates renamed attributes correspoding to React.</span>
+    <span class="k">def</span> <span class="nf">__getReactAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates renamed attributes correspoding to React, and removes</span>
+<span class="sd">        inline style tags</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -388,6 +499,8 @@
 
         <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attrKey</span> <span class="o">==</span> <span class="s2">&quot;style&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">:</span>
                 <span class="n">useKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -395,7 +508,7 @@
             <span class="n">final_attrs</span><span class="p">[</span><span class="n">useKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">final_attrs</span>
 
-<div class="viewcode-block" id="ReactCodeMapper.getReactMap"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.ReactCodeMapper.getReactMap">[docs]</a>    <span class="k">def</span> <span class="nf">getReactMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+<div class="viewcode-block" id="ReactCodeMapper.getReactMap"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.ReactCodeMapper.getReactMap">[docs]</a>    <span class="k">def</span> <span class="nf">getReactMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">filepath_from_src</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Wrapper to generate React Map object comprising of all data needed</span>
 <span class="sd">        to convert HTML to React</span>
 
@@ -403,6 +516,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        tags : dict</span>
 <span class="sd">            HTML attributes extracted using AttributesParser</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src directory</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -418,11 +533,12 @@
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
             <span class="n">tag_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getRenamedAttrs</span><span class="p">(</span><span class="n">tag</span><span class="p">[</span><span class="n">tag_name</span><span class="p">])</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getReactAttrs</span><span class="p">(</span><span class="n">tag</span><span class="p">[</span><span class="n">tag_name</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span><span class="p">:</span>
                 <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__customTagAttrsHandler</span><span class="p">(</span>
                     <span class="n">attrs</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">CUSTOM_TAG_HANDLERS</span><span class="p">[</span><span class="n">tag_name</span><span class="p">],</span>
+                    <span class="n">filepath_from_src</span>
                 <span class="p">)</span>
             <span class="n">final_map</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">tag_name</span><span class="p">:</span> <span class="n">attrs</span><span class="p">})</span>
         <span class="n">final_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">add_to_import</span><span class="p">)</span>
@@ -441,8 +557,8 @@
 <span class="sd">        Path of the source directory within the project directory</span>
 <span class="sd">    dest_dir : str</span>
 <span class="sd">        Path to the transpiled React app within the project directory</span>
-<span class="sd">    static_dir : str</span>
-<span class="sd">        Name of static dir for HTML directory</span>
+<span class="sd">    index_routes : dict</span>
+<span class="sd">        Stores Routes data corresponding to different pages for index.js</span>
 <span class="sd">    parser : str, optional</span>
 <span class="sd">        Specify which parser to use for reading HTML files, defaults</span>
 <span class="sd">        to &quot;html.parser&quot;</span>
@@ -460,7 +576,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        config_settings : dict</span>
-<span class="sd">            project_name, src_dir, dest_dir, static_dir as dict object stored</span>
+<span class="sd">            project_name, src_dir, dest_dir as dict object stored</span>
 <span class="sd">            in config.json</span>
 <span class="sd">        props_map : dict</span>
 <span class="sd">            Mapping of props for HTML to React used during transpilation</span>
@@ -478,8 +594,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;project_name&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;src_dir&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="s2">&quot;static_dir&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span> <span class="o">=</span> <span class="n">props_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_routes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="s2">&quot;html.parser&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
@@ -511,6 +627,10 @@
 
             <span class="c1"># Install NPM packages</span>
             <span class="n">npm</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="s1">&#39;react-helmet&#39;</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">)</span>
+            <span class="n">npm</span><span class="o">.</span><span class="n">install</span><span class="p">(</span>
+                <span class="n">package_name</span><span class="o">=</span><span class="s1">&#39;react-router-dom&#39;</span><span class="p">,</span>
+                <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__replaceAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">or_attrs</span><span class="p">,</span> <span class="n">f_attrs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Replaces the attrs for updated tags comparing original and final attrs.</span>
@@ -529,7 +649,24 @@
 
         <span class="k">if</span> <span class="n">or_attrs</span> <span class="o">==</span> <span class="n">f_attrs</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">or_attrs</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">f_attrs</span>
+
+        <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">or_attrs</span><span class="p">)</span>
+
+        <span class="n">upperAttrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lowerAttrs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">or_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">upperAttrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">or_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="n">lowerAttrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">or_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">upperAttrs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">lowerAttrs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">htmlTag</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">f_attrs</span>
+            <span class="k">if</span> <span class="n">tag_name</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span> <span class="ow">and</span> <span class="s2">&quot;to&quot;</span> <span class="ow">in</span> <span class="n">f_attrs</span><span class="p">:</span>
+                <span class="n">htmlTag</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Link&quot;</span>
 
     <span class="k">def</span> <span class="nf">__deleteTag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deletes the tag corresponding to given tag_name and attrs.</span>
@@ -544,9 +681,23 @@
 <span class="sd">            Dictonary consisting of original attributes of HTML.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+        <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__generateReactFileContent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">function_name</span><span class="p">):</span>
+        <span class="n">upperAttrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lowerAttrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">upperAttrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="n">lowerAttrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">upperAttrs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">htmlTag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">lowerAttrs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">htmlTag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">htmlTag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__generateReactFileContent</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates React code from HTML soup object.</span>
 
 <span class="sd">        Parameters</span>
@@ -554,7 +705,10 @@
 <span class="sd">        soup : BeautifulSoup</span>
 <span class="sd">            bs4.BeautifulSoup with HTML code to be transpiled.</span>
 <span class="sd">        function_name : str</span>
-<span class="sd">            Function name to be used from filename without extension.</span>
+<span class="sd">            Function name to be used from filename without extension with</span>
+<span class="sd">            first letter capitalized</span>
+<span class="sd">        filepath_from_src : str</span>
+<span class="sd">            Path to file from src directory</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -562,12 +716,20 @@
 <span class="sd">            Content for React file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">styleTags</span> <span class="o">=</span> <span class="p">[</span><span class="n">style</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span> <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;style&#39;</span><span class="p">)]</span>
+        <span class="n">scriptTags</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span> <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="n">attributes_parser</span> <span class="o">=</span> <span class="n">AttributesParser</span><span class="p">()</span>
         <span class="n">attributes_parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
         <span class="n">tag_with_attributes</span> <span class="o">=</span> <span class="n">attributes_parser</span><span class="o">.</span><span class="n">data</span>
 
-        <span class="n">reactCodeMapper</span> <span class="o">=</span> <span class="n">ReactCodeMapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">)</span>
-        <span class="n">react_map</span> <span class="o">=</span> <span class="n">reactCodeMapper</span><span class="o">.</span><span class="n">getReactMap</span><span class="p">(</span><span class="n">tag_with_attributes</span><span class="p">)</span>
+        <span class="n">reactCodeMapper</span> <span class="o">=</span> <span class="n">ReactCodeMapper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span>
+        <span class="p">)</span>
+        <span class="n">react_map</span> <span class="o">=</span> <span class="n">reactCodeMapper</span><span class="o">.</span><span class="n">getReactMap</span><span class="p">(</span>
+            <span class="n">tag_with_attributes</span><span class="p">,</span> <span class="n">filepath_from_src</span>
+        <span class="p">)</span>
 
         <span class="n">final_tags</span> <span class="o">=</span> <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
         <span class="n">react_variables</span> <span class="o">=</span> <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span>
@@ -589,7 +751,17 @@
                     <span class="n">or_tag_name</span>
                 <span class="p">)</span>
 
-        <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Helmet&#39;</span>
+        <span class="n">reactHead</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="p">:</span>
+            <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Helmet&#39;</span>
+            <span class="n">reactHead</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">Helmet</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">styleTags</span><span class="p">):</span>
+                <span class="n">reactHead</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">new_tag</span><span class="p">(</span><span class="s1">&#39;Helmet&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">styleTags</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">styleTags</span><span class="p">:</span>
+                <span class="n">reactHead</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
 
         <span class="n">contents</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">contents</span>
 
@@ -598,7 +770,11 @@
         <span class="p">]</span>
         <span class="n">body_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body_contents</span><span class="p">)</span>
 
-        <span class="n">content_str</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">Helmet</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span> <span class="o">+</span> <span class="n">body_str</span>
+        <span class="k">if</span> <span class="n">reactHead</span><span class="p">:</span>
+            <span class="n">content_str</span> <span class="o">=</span> <span class="n">reactHead</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span> <span class="o">+</span> <span class="n">body_str</span>
+            <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;import Helmet from &#39;react-helmet&#39;;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content_str</span> <span class="o">=</span> <span class="n">body_str</span>
 
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">react_variables</span><span class="p">:</span>
             <span class="n">content_str</span> <span class="o">=</span> <span class="n">content_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
@@ -606,67 +782,207 @@
                 <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">variable</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
             <span class="p">)</span>
 
-        <span class="n">react_function</span> <span class="o">=</span> <span class="s2">&quot;function &quot;</span> <span class="o">+</span> <span class="n">function_name</span> <span class="o">+</span> <span class="s2">&quot;() {return (&lt;&gt;&quot;</span> <span class="o">+</span> \
-            <span class="n">content_str</span> <span class="o">+</span> <span class="s2">&quot;&lt;/&gt;);}&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scriptTags</span><span class="p">):</span>
+            <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;import React, { useEffect } from &#39;react&#39;;&quot;</span>
+            <span class="n">scriptContent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">scriptTags</span><span class="p">:</span>
+                <span class="n">scriptContent</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
+            <span class="n">useEffect</span> <span class="o">=</span> <span class="s2">&quot;useEffect(() =&gt; {&quot;</span> <span class="o">+</span> <span class="n">scriptContent</span> <span class="o">+</span> <span class="s2">&quot;}, []);&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;import React from &#39;react&#39;;&quot;</span>
+            <span class="n">useEffect</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">styleTags</span><span class="p">):</span>
+            <span class="n">content_str</span> <span class="o">=</span> <span class="n">content_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;style&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;style&gt;{`&quot;</span><span class="p">)</span>
+            <span class="n">content_str</span> <span class="o">=</span> <span class="n">content_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;/style&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;`}&lt;/style&gt;&quot;</span><span class="p">)</span>
+
+        <span class="n">react_function</span> <span class="o">=</span> <span class="s2">&quot;function &quot;</span> <span class="o">+</span> <span class="n">function_name</span> <span class="o">+</span> <span class="s2">&quot;() {  &quot;</span> <span class="o">+</span> <span class="n">useEffect</span> <span class="o">+</span> \
+            <span class="s2">&quot;  return (&lt;&gt;&quot;</span> <span class="o">+</span> <span class="n">content_str</span> <span class="o">+</span> <span class="s2">&quot;&lt;/&gt;);}&quot;</span>
 
         <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        import React from &#39;react&#39;;</span>
-<span class="s2">        import Helmet from &#39;react-helmet&#39;;</span>
 <span class="s2">        </span><span class="si">{imports}</span><span class="s2"></span>
 
 <span class="s2">        </span><span class="si">{function}</span><span class="s2"></span>
 
-<span class="s2">        export default App;</span>
-<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">react_function</span><span class="p">,</span> <span class="n">imports</span><span class="o">=</span><span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
+<span class="s2">        export default </span><span class="si">{function_name}</span><span class="s2">;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">,</span>
+            <span class="n">function</span><span class="o">=</span><span class="n">react_function</span><span class="p">,</span>
+            <span class="n">imports</span><span class="o">=</span><span class="n">react_map</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
 
-<div class="viewcode-block" id="Transpiler.copyStaticFolderToDest"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.copyStaticFolderToDest">[docs]</a>    <span class="k">def</span> <span class="nf">copyStaticFolderToDest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Copies source static folder to the transpiled React code static</span>
-<span class="sd">        folder inside src</span>
+    <span class="k">def</span> <span class="nf">__getReactComponentName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates safe name for React compnents from path to file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link : str</span>
+<span class="sd">            Path to file for which varibale is created.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Variable name generated from link</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">static_src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span><span class="p">)</span>
-        <span class="n">static_dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_dir</span><span class="p">)</span>
+        <span class="n">varName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">link</span><span class="p">:</span>
+            <span class="n">_ch</span> <span class="o">=</span> <span class="n">ch</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+                <span class="n">_ch</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span>
+            <span class="n">varName</span> <span class="o">+=</span> <span class="n">_ch</span>
+        <span class="k">return</span> <span class="s2">&quot;REACTONITE&quot;</span> <span class="o">+</span> <span class="n">varName</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">):</span>
-            <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">__generateIndexJsContent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates content for index.js file in React codebase with handled routes</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Copying static folder directory...&#39;</span><span class="p">)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Content for index.js file in React codebase</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">copy_tree</span><span class="p">(</span><span class="n">static_src_dir</span><span class="p">,</span> <span class="n">static_dest_dir</span><span class="p">)</span></div>
+        <span class="n">router</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;import {</span>
+<span class="s2">                        BrowserRouter as Router,</span>
+<span class="s2">                        Switch,</span>
+<span class="s2">                        Route</span>
+<span class="s2">                    } from &quot;react-router-dom&quot;;&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Transpiler.transpileFile"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpileFile">[docs]</a>    <span class="k">def</span> <span class="nf">transpileFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">is_init_html</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">imports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">routes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">link</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_routes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">componentName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getReactComponentName</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">importReact</span> <span class="o">=</span> <span class="s1">&#39;import &#39;</span> <span class="o">+</span> <span class="n">componentName</span> <span class="o">+</span> <span class="s1">&#39; from &quot;&#39;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;&quot;;&#39;</span>
+            <span class="n">imports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">importReact</span><span class="p">)</span>
+            <span class="n">routeReact</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;Route path=&quot;/</span><span class="si">{link}</span><span class="s2">&quot;&gt;</span>
+<span class="s2">                &lt;</span><span class="si">{componentName}</span><span class="s2"> /&gt;</span>
+<span class="s2">            &lt;/Route&gt;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">,</span> <span class="n">componentName</span><span class="o">=</span><span class="n">componentName</span><span class="p">)</span>
+            <span class="n">routes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">routeReact</span><span class="p">)</span>
+
+        <span class="n">imports</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imports</span><span class="p">)</span>
+        <span class="n">routes</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">routes</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        import React from &quot;react&quot;;</span>
+<span class="s2">        import ReactDOM from &quot;react-dom&quot;;</span>
+<span class="s2">        import * as serviceWorkerRegistration from </span><span class="se">\</span>
+<span class="s2">            &quot;./serviceWorkerRegistration&quot;;</span>
+<span class="s2">        import reportWebVitals from &quot;./reportWebVitals&quot;;</span>
+<span class="s2">        </span><span class="si">{router}</span><span class="s2"></span>
+
+<span class="s2">        import App from &quot;./App&quot;;</span>
+<span class="s2">        </span><span class="si">{imports}</span><span class="s2"></span>
+
+<span class="s2">        ReactDOM.render(</span>
+<span class="s2">        &lt;Router&gt;</span>
+<span class="s2">            &lt;Switch&gt;</span>
+<span class="s2">            </span><span class="si">{routes}</span><span class="s2"></span>
+<span class="s2">            &lt;Route path=&quot;/&quot;&gt;</span>
+<span class="s2">                &lt;App /&gt;</span>
+<span class="s2">            &lt;/Route&gt;</span>
+<span class="s2">            &lt;/Switch&gt;</span>
+<span class="s2">        &lt;/Router&gt;,</span>
+<span class="s2">        document.getElementById(&quot;root&quot;)</span>
+<span class="s2">        );</span>
+
+<span class="s2">        // If you want your app to work offline and load faster, you can change</span>
+<span class="s2">        // unregister() to register() below. Note this comes with some</span>
+<span class="s2">        // pitfalls. Learn more about service workers: https://cra.link/PWA</span>
+<span class="s2">        serviceWorkerRegistration.unregister();</span>
+
+<span class="s2">        // If you want to start measuring performance in your app, pass a</span>
+<span class="s2">        // function to log results (for example: reportWebVitals(console.log))</span>
+<span class="s2">        // or send to analytics endpoint. Learn more: https://bit.ly/CRA-vitals</span>
+<span class="s2">        reportWebVitals();</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">imports</span><span class="o">=</span><span class="n">imports</span><span class="p">,</span> <span class="n">routes</span><span class="o">=</span><span class="n">routes</span><span class="p">,</span> <span class="n">router</span><span class="o">=</span><span class="n">router</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rebuildIndexJs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates the index.js for React apps entry point, needed to handle</span>
+<span class="sd">        links to pages</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Raised if the index.js file is not found in dest_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pathToIndexJs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;index.js&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pathToIndexJs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Looks like you are missing index.js file in </span><span class="se">\</span>
+<span class="s2">                React directory! It seems to be an NPM/React issue rather.&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pathToIndexJs</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">file_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generateIndexJsContent</span><span class="p">()</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span>
+
+        <span class="n">NodeWrapper</span><span class="p">()</span><span class="o">.</span><span class="n">prettify</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">pathToIndexJs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__addRoutesToIndexLinkArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filenameNoExt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds links to self.index_routes to be used in index.js generation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filePathFromSrc : str</span>
+<span class="sd">            Path to the folder where file is in dest_dir folder from src</span>
+<span class="sd">        filenameNoExt : str</span>
+<span class="sd">            Filename with no extension</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">filenameNoExt</span> <span class="o">==</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span>
+            <span class="n">htmlPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">filePathFromSrc</span><span class="p">)</span>
+            <span class="n">jsPath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">htmlPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_routes</span><span class="p">[</span><span class="n">jsPath</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span> <span class="o">+</span> <span class="n">jsPath</span> <span class="o">+</span> <span class="s2">&quot;/index&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">htmlPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filenameNoExt</span>
+            <span class="p">))</span>
+            <span class="n">jsPath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">htmlPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_routes</span><span class="p">[</span><span class="n">jsPath</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span> <span class="o">+</span> <span class="n">jsPath</span>
+
+<div class="viewcode-block" id="Transpiler.transpileFile"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpileFile">[docs]</a>    <span class="k">def</span> <span class="nf">transpileFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Transpiles the source HTML file given at the given filepath</span>
 <span class="sd">        to a React code, which is then copied over to the React build</span>
-<span class="sd">        directory</span>
+<span class="sd">        directory, if not HTML file then get&#39;s copied directly.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filepath : str</span>
 <span class="sd">            Path to the source HTML file which is to be transpiled</span>
-<span class="sd">        is_init_html : bool, optional</span>
-<span class="sd">            Set to True if file to be transpiled is init html file as it will</span>
-<span class="sd">            be renamed to App.js</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        RuntimeError</span>
-<span class="sd">            Raised if the source html file doesn&#39;t have a .html</span>
-<span class="sd">            extention</span>
-<span class="sd">        RuntimeError</span>
 <span class="sd">            Raised if the source html file is not found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">[</span><span class="n">filepath</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:])</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
         <span class="n">filenameWithNoExtension</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_extension</span> <span class="o">!=</span> <span class="s2">&quot;.html&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is not a HTML file&#39;</span><span class="p">)</span>
+            <span class="n">dest_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filename</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Copying file &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="s2">&quot; -&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">dest_filepath</span><span class="p">)</span>
+            <span class="k">return</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> file not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">is_init_html</span><span class="p">:</span>
+        <span class="n">is_entry_point</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">entry_point_html</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">entry_point_html</span> <span class="o">==</span> <span class="n">filepath</span><span class="p">:</span>
+            <span class="n">is_entry_point</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">filenameWithNoExtension</span> <span class="o">=</span> <span class="s2">&quot;App&quot;</span>
 
         <span class="n">filename</span> <span class="o">=</span> <span class="n">filenameWithNoExtension</span> <span class="o">+</span> <span class="s2">&quot;.js&quot;</span>
@@ -676,7 +992,9 @@
 <span class="s2">                created please check your &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span> <span class="o">+</span> <span class="s2">&quot; for a src </span><span class="se">\</span>
 <span class="s2">                    folder&quot;</span><span class="p">)</span>
 
-        <span class="n">dest_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">dest_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filename</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
@@ -687,19 +1005,30 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">index</span><span class="p">:</span>
             <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">)</span>
 
+        <span class="c1"># Remove all comments</span>
+        <span class="n">comments</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">Comment</span><span class="p">))</span>
+        <span class="p">[</span><span class="n">comment</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span> <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">comments</span><span class="p">]</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
             <span class="n">file_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generateReactFileContent</span><span class="p">(</span>
                 <span class="n">soup</span><span class="p">,</span>
-                <span class="n">filenameWithNoExtension</span>
+                <span class="n">filenameWithNoExtension</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+                <span class="n">filePathFromSrc</span>
             <span class="p">)</span>
             <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span>
 
-        <span class="n">NodeWrapper</span><span class="p">()</span><span class="o">.</span><span class="n">prettify</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">dest_filepath</span><span class="p">)</span></div>
+        <span class="n">NodeWrapper</span><span class="p">()</span><span class="o">.</span><span class="n">prettify</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">dest_filepath</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_entry_point</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__addRoutesToIndexLinkArray</span><span class="p">(</span>
+                <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filenameWithNoExtension</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Transpiler.transpile_project"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpile_project">[docs]</a>    <span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Runs initial checks like ensuring the source</span>
 <span class="sd">        directories exist, and the source file is present.</span>
-<span class="sd">        After that, copies static files and transpiles the source.</span>
+<span class="sd">        After that, copies non html files and transpiles the source.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -715,17 +1044,16 @@
                 <span class="nb">str</span><span class="p">(</span><span class="n">entry_point_html</span><span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="c1"># Copy static assests</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">copyStaticFolderToDest</span><span class="p">()</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transpiling files...&quot;</span><span class="p">)</span>
 
-        <span class="c1"># TODO: Next Release, Loop through all files/dirs in src folder except</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
-            <span class="n">entry_point_html</span><span class="p">,</span>
-            <span class="n">is_init_html</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span></div></div>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">+</span> <span class="s1">&#39;**/**&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
+                    <span class="n">filename</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rebuildIndexJs</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

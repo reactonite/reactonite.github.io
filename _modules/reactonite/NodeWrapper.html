@@ -236,7 +236,7 @@
 
         <span class="c1"># TODO: Log these version numbers</span>
 
-<div class="viewcode-block" id="NodeWrapper.create_react_app"><a class="viewcode-back" href="../../reactonite.html#reactonite.NodeWrapper.NodeWrapper.create_react_app">[docs]</a>    <span class="k">def</span> <span class="nf">create_react_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">rename_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeWrapper.create_react_app"><a class="viewcode-back" href="../../reactonite.html#reactonite.NodeWrapper.NodeWrapper.create_react_app">[docs]</a>    <span class="k">def</span> <span class="nf">create_react_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">rename_to</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates a new react app and renames it as specified.</span>
 
 <span class="sd">        Parameters</span>
@@ -250,14 +250,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">npx</span><span class="p">,</span> <span class="s2">&quot;create-react-app&quot;</span><span class="p">,</span>
-                        <span class="n">project_name</span><span class="p">,</span> <span class="s2">&quot;--use-npm&quot;</span><span class="p">],</span>
+                        <span class="n">project_name</span><span class="p">,</span> <span class="s2">&quot;--use-npm&quot;</span><span class="p">,</span> <span class="s2">&quot;--template&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;cra-template-pwa&quot;</span><span class="p">],</span>
                        <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                        <span class="n">cwd</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
 
         <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">rename_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">rename_to</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span></div>
+        <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">rename_to</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NodeWrapper.install"><a class="viewcode-back" href="../../reactonite.html#reactonite.NodeWrapper.NodeWrapper.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Installs the given package in npm and saves in package.json</span>
