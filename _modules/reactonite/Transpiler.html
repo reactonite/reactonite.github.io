@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Config">reactonite.Config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Constants">reactonite.Constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.CreateHtmlCss">reactonite.CreateHtmlCss module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Helpers">reactonite.Helpers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.PropsMap">reactonite.PropsMap module</a></li>
@@ -1031,11 +1032,13 @@
         <span class="sd">&quot;&quot;&quot;Runs initial checks like ensuring the source</span>
 <span class="sd">        directories exist, and the source file is present.</span>
 <span class="sd">        After that, copies non html files and transpiles the source.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        copy_static : bool</span>
-<span class="sd">            will copy non .html files if true, only .html files will be </span>
-<span class="sd">            transpiled if false</span>
+<span class="sd">        copy_static : bool, optional</span>
+<span class="sd">            Will copy non .html files if True, only .html files will be</span>
+<span class="sd">            transpiled if False, default True</span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        RuntimeError</span>
@@ -1057,7 +1060,7 @@
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;.html&quot;</span> <span class="ow">or</span> <span class="n">copy_static</span><span class="p">:</span>           
+                <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;.html&quot;</span> <span class="ow">or</span> <span class="n">copy_static</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
                         <span class="n">filepath</span>
                     <span class="p">)</span>

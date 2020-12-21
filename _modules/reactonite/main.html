@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>reactonite.main &mdash; Reactonite dev documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/custom.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Reactonite
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reactonite</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reactonite.html">reactonite package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Config">reactonite.Config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Constants">reactonite.Constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.CreateHtmlCss">reactonite.CreateHtmlCss module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Helpers">reactonite.Helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.PropsMap">reactonite.PropsMap module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.ReactoniteWatcher">reactonite.ReactoniteWatcher module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.Transpiler">reactonite.Transpiler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite.main">reactonite.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reactonite.html#module-reactonite">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Reactonite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>reactonite.main</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for reactonite.main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">_thread</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">distutils.dir_util</span> <span class="kn">import</span> <span class="n">copy_tree</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+
+<span class="kn">import</span> <span class="nn">click</span>
+
+<span class="kn">from</span> <span class="nn">.Config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">.Constants</span> <span class="kn">import</span> <span class="n">DEFAULTS</span>
+<span class="kn">from</span> <span class="nn">.Helpers</span> <span class="kn">import</span> <span class="n">create_dir</span>
+<span class="kn">from</span> <span class="nn">.NodeWrapper</span> <span class="kn">import</span> <span class="n">NodeWrapper</span>
+<span class="kn">from</span> <span class="nn">.ReactoniteWatcher</span> <span class="kn">import</span> <span class="n">ReactoniteWatcher</span>
+<span class="kn">from</span> <span class="nn">.Transpiler</span> <span class="kn">import</span> <span class="n">Transpiler</span>
+
+<span class="kn">from</span> <span class="nn">reactonite</span> <span class="kn">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span>
+
+<span class="kn">from</span> <span class="nn">.CreateHtmlCss</span> <span class="kn">import</span> <span class="n">saveCss</span><span class="p">,</span> <span class="n">saveHtml</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fetchCodeFromGrapesjs"><a class="viewcode-back" href="../../reactonite.html#reactonite.main.fetchCodeFromGrapesjs">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/grapesjs&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">fetchCodeFromGrapesjs</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+
+            <span class="n">src_dir</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span>
+
+            <span class="n">saveCss</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;css&#39;</span><span class="p">],</span> <span class="n">src_dir</span><span class="p">)</span>
+            <span class="n">saveHtml</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;html&#39;</span><span class="p">],</span> <span class="n">src_dir</span><span class="p">)</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Data Received Successfully&#39;</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in handling POST Request - &#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Error in Handling POST Request&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">550</span><span class="p">)</span></div>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">version_option</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Entry point for Reactonite cli.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;project-name&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">create_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for creating new Reactonite project from scratch.</span>
+
+<span class="sd">    Creates a new reactonite project with given PROJECT_NAME and installs npm</span>
+<span class="sd">    packages along with basic directory structure layout.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project_name : str</span>
+<span class="sd">        Name of the project to be created.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If project name is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+
+    <span class="n">project_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+    <span class="n">src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span><span class="p">)</span>
+
+    <span class="c1"># Valid project name checks</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">project_name</span><span class="o">.</span><span class="n">islower</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; must be lower case.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">project_name</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; only - is allowed as a special character.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">project_dir</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; directory already exists.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;project_name&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;src_dir&quot;</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">DEST_DIR</span><span class="p">)</span>
+
+    <span class="c1"># Create project directory</span>
+    <span class="n">create_dir</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span>
+
+    <span class="c1"># Initial setup of project/src directory</span>
+    <span class="n">package_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">init_src_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_path</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">INIT_FILES_DIR</span><span class="p">)</span>
+    <span class="n">copy_tree</span><span class="p">(</span><span class="n">init_src_dir_path</span><span class="p">,</span> <span class="n">src_dir</span><span class="p">)</span>
+
+    <span class="c1"># Move .gitignore to outerlayer</span>
+    <span class="n">gitignore_src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;.gitignore&#39;</span><span class="p">)</span>
+    <span class="n">gitignore_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="s1">&#39;.gitignore&#39;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">gitignore_src</span><span class="p">,</span> <span class="n">gitignore_dest</span><span class="p">)</span>
+
+    <span class="c1"># Create template config.json in project dir</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">save_config</span><span class="p">()</span>
+
+    <span class="c1"># Transpile once</span>
+    <span class="n">transpiler</span> <span class="o">=</span> <span class="n">Transpiler</span><span class="p">(</span>
+        <span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+        <span class="n">props_map</span><span class="o">=</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">PROPS_MAP</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">create_project</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">transpiler</span><span class="o">.</span><span class="n">transpile_project</span><span class="p">()</span>
+
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for transpiling a Reactonite project built using</span>
+<span class="sd">    create-project commandline.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Verbosity of the command</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If config.json file doesn&#39;t exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span>
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">transpiler</span> <span class="o">=</span> <span class="n">Transpiler</span><span class="p">(</span>
+        <span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+        <span class="n">props_map</span><span class="o">=</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">PROPS_MAP</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+    <span class="p">)</span>
+    <span class="n">transpiler</span><span class="o">.</span><span class="n">transpile_project</span><span class="p">()</span>
+
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Command to start realtime development transpiler for Reactonite. It</span>
+<span class="sd">    starts react development server in a seperate thread as well and watches</span>
+<span class="sd">    for changes in project directory and transpiles codebase.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If config.json file doesn&#39;t exist</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If ReactJs development thread is not able to start</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span>
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">)</span>
+    <span class="c1"># Initial transpile</span>
+    <span class="n">transpiler</span> <span class="o">=</span> <span class="n">Transpiler</span><span class="p">(</span>
+        <span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+        <span class="n">props_map</span><span class="o">=</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">PROPS_MAP</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">transpiler</span><span class="o">.</span><span class="n">transpile_project</span><span class="p">()</span>
+
+    <span class="n">npm</span> <span class="o">=</span> <span class="n">NodeWrapper</span><span class="p">()</span>
+    <span class="n">watcher</span> <span class="o">=</span> <span class="n">ReactoniteWatcher</span><span class="p">(</span><span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">())</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_thread</span><span class="o">.</span><span class="n">start_new_thread</span><span class="p">(</span><span class="n">npm</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">),))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to start ReactJs development thread&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Starting Watcher</span>
+    <span class="n">watcher</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;project-name&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">gui</span><span class="p">(</span><span class="n">project_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command to start realtime development transpiler and GUI for Reactonite. It</span>
+<span class="sd">    starts react development server and GUI in a seperate thread as well and</span>
+<span class="sd">    watches for changes in project directory and transpiles codebase.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project_name : str</span>
+<span class="sd">        Name of the project to be created.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If config.json file doesn&#39;t exist</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If ReactJs development thread is not able to start</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+
+    <span class="n">project_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+    <span class="n">src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span><span class="p">)</span>
+
+    <span class="c1"># Valid project name checks</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">project_name</span><span class="o">.</span><span class="n">islower</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; must be lower case.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">project_name</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; only - is allowed as a special character.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">project_dir</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid project name &quot;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot; directory already exists.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;project_name&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;src_dir&quot;</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span><span class="p">)</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">add_to_config</span><span class="p">(</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">DEST_DIR</span><span class="p">)</span>
+
+    <span class="c1"># Create project directory</span>
+    <span class="n">create_dir</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span>
+
+    <span class="c1"># Initial setup of project/src directory</span>
+    <span class="n">package_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">init_src_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_path</span><span class="p">,</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">INIT_FILES_DIR</span><span class="p">)</span>
+    <span class="n">copy_tree</span><span class="p">(</span><span class="n">init_src_dir_path</span><span class="p">,</span> <span class="n">src_dir</span><span class="p">)</span>
+
+    <span class="c1"># Move .gitignore to outerlayer</span>
+    <span class="n">gitignore_src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;.gitignore&#39;</span><span class="p">)</span>
+    <span class="n">gitignore_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="s1">&#39;.gitignore&#39;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">gitignore_src</span><span class="p">,</span> <span class="n">gitignore_dest</span><span class="p">)</span>
+
+    <span class="c1"># Create template config.json in project dir</span>
+    <span class="n">config_settings</span><span class="o">.</span><span class="n">save_config</span><span class="p">()</span>
+
+    <span class="c1"># Transpile once</span>
+    <span class="n">transpiler</span> <span class="o">=</span> <span class="n">Transpiler</span><span class="p">(</span>
+        <span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+        <span class="n">props_map</span><span class="o">=</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">PROPS_MAP</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">create_project</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">transpiler</span><span class="o">.</span><span class="n">transpile_project</span><span class="p">()</span>
+
+    <span class="n">project_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span>
+
+    <span class="c1"># src_dir = os.path.join(project_dir, CONSTANTS.SRC_DIR)</span>
+    <span class="n">src_dir</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">SRC_DIR</span>
+
+    <span class="n">folders</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">src_dir</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">src_dir</span><span class="p">))[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">folders</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">folder</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="o">!=</span> <span class="s1">&#39;index.html&#39;</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">),</span>
+                                    <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
+
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">)</span>
+
+    <span class="n">npm</span> <span class="o">=</span> <span class="n">NodeWrapper</span><span class="p">()</span>
+    <span class="n">watcher</span> <span class="o">=</span> <span class="n">ReactoniteWatcher</span><span class="p">(</span><span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">())</span>
+
+    <span class="n">npm</span><span class="o">.</span><span class="n">install_grapesjs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">reactonite_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">npm</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                                   <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">),))</span>
+        <span class="n">grapesjs_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">npm</span><span class="o">.</span><span class="n">start_grapesjs</span><span class="p">,</span>
+                                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">),))</span>
+        <span class="n">grapesjs_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">flask_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
+                              <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,))</span>
+        <span class="n">flask_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">watcher_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watcher</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                                <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+        <span class="n">flask_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">flask_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">grapesjs_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">reactonite_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">watcher_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+            <span class="n">reactonite_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to start ReactJs development thread&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">build</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Command to get a static build of your app after transpilation.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If config.json file doesn&#39;t exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONSTANTS</span> <span class="o">=</span> <span class="n">DEFAULTS</span><span class="p">()</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span>
+    <span class="n">config_settings</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">transpiler</span> <span class="o">=</span> <span class="n">Transpiler</span><span class="p">(</span>
+        <span class="n">config_settings</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+        <span class="n">props_map</span><span class="o">=</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">PROPS_MAP</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">transpiler</span><span class="o">.</span><span class="n">transpile_project</span><span class="p">()</span>
+
+    <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">config_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dest_dir&quot;</span><span class="p">)</span>
+
+    <span class="n">npm</span> <span class="o">=</span> <span class="n">NodeWrapper</span><span class="p">()</span>
+    <span class="n">npm</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">dest_dir</span><span class="p">)</span>
+
+    <span class="c1"># Move build folder to project_dir instead of dest_dir</span>
+    <span class="n">npm_build</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">)</span>
+    <span class="n">project_build</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">npm_build</span><span class="p">,</span> <span class="n">project_build</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Reactonite
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

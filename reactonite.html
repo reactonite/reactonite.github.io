@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Config">reactonite.Config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Constants">reactonite.Constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reactonite.CreateHtmlCss">reactonite.CreateHtmlCss module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.Helpers">reactonite.Helpers module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.NodeWrapper">reactonite.NodeWrapper module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reactonite.PropsMap">reactonite.PropsMap module</a></li>
@@ -322,6 +323,37 @@ doesn’t exist, then writes into it.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-reactonite.CreateHtmlCss">
+<span id="reactonite-createhtmlcss-module"></span><h2>reactonite.CreateHtmlCss module<a class="headerlink" href="#module-reactonite.CreateHtmlCss" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="reactonite.CreateHtmlCss.saveCss">
+<code class="sig-prename descclassname">reactonite.CreateHtmlCss.</code><code class="sig-name descname">saveCss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content</span></em>, <em class="sig-param"><span class="n">loc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/CreateHtmlCss.html#saveCss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.CreateHtmlCss.saveCss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes body of the POST response from GrapesJS and saves CSS File</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> (<em>str</em>) – CSS Content</p></li>
+<li><p><strong>loc</strong> (<em>str</em>) – Location where we have to save the CSS File</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="reactonite.CreateHtmlCss.saveHtml">
+<code class="sig-prename descclassname">reactonite.CreateHtmlCss.</code><code class="sig-name descname">saveHtml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content</span></em>, <em class="sig-param"><span class="n">loc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/CreateHtmlCss.html#saveHtml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.CreateHtmlCss.saveHtml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes body of the POST response from GrapesJS and saves HTML File</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> (<em>str</em>) – HTML Content</p></li>
+<li><p><strong>loc</strong> (<em>str</em>) – Location where we have to save the HTML File</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-reactonite.Helpers">
 <span id="reactonite-helpers-module"></span><h2>reactonite.Helpers module<a class="headerlink" href="#module-reactonite.Helpers" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -484,6 +516,11 @@ available it throws an error.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="reactonite.NodeWrapper.NodeWrapper.install_grapesjs">
+<code class="sig-name descname">install_grapesjs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.install_grapesjs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.install_grapesjs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="reactonite.NodeWrapper.NodeWrapper.prettify">
 <code class="sig-name descname">prettify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.prettify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.prettify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs code formatting using prettier on the given path</p>
@@ -507,6 +544,11 @@ available it throws an error.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt id="reactonite.NodeWrapper.NodeWrapper.start_grapesjs">
+<code class="sig-name descname">start_grapesjs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/NodeWrapper.html#NodeWrapper.start_grapesjs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.NodeWrapper.NodeWrapper.start_grapesjs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -868,14 +910,14 @@ directory, if not HTML file then get’s copied directly.</p>
 <code class="sig-name descname">transpile_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">copy_static</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpile_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpile_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs initial checks like ensuring the source
 directories exist, and the source file is present.
-After that, copies non html files and transpiles the source.
-:param copy_static: will copy non .html files if true, only .html files will be</p>
-<blockquote>
-<div><p>transpiled if false</p>
-</div></blockquote>
+After that, copies non html files and transpiles the source.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>RuntimeError</strong> – Raised source html file is missing.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>copy_static</strong> (<em>bool</em><em>, </em><em>optional</em>) – Will copy non .html files if True, only .html files will be
+transpiled if False, default True</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – Raised source html file is missing.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -885,6 +927,11 @@ After that, copies non html files and transpiles the source.
 </div>
 <div class="section" id="module-reactonite.main">
 <span id="reactonite-main-module"></span><h2>reactonite.main module<a class="headerlink" href="#module-reactonite.main" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="reactonite.main.fetchCodeFromGrapesjs">
+<code class="sig-prename descclassname">reactonite.main.</code><code class="sig-name descname">fetchCodeFromGrapesjs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/main.html#fetchCodeFromGrapesjs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.main.fetchCodeFromGrapesjs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-reactonite">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-reactonite" title="Permalink to this headline">¶</a></h2>

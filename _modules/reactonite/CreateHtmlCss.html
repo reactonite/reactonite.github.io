@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>reactonite.Constants &mdash; Reactonite dev documentation</title>
+  <title>reactonite.CreateHtmlCss &mdash; Reactonite dev documentation</title>
   
 
   
@@ -154,7 +154,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>reactonite.Constants</li>
+      <li>reactonite.CreateHtmlCss</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,33 +169,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for reactonite.Constants</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.PropsMap</span> <span class="kn">import</span> <span class="n">props_map</span>
+  <h1>Source code for reactonite.CreateHtmlCss</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 
 
-<div class="viewcode-block" id="DEFAULTS"><a class="viewcode-back" href="../../reactonite.html#reactonite.Constants.DEFAULTS">[docs]</a><span class="k">class</span> <span class="nc">DEFAULTS</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Default variables used in code execution</span>
+<div class="viewcode-block" id="saveHtml"><a class="viewcode-back" href="../../reactonite.html#reactonite.CreateHtmlCss.saveHtml">[docs]</a><span class="k">def</span> <span class="nf">saveHtml</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">loc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes body of the POST response from GrapesJS and saves HTML File</span>
 
-<span class="sd">    Attributes</span>
+<span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    INIT_FILES_DIR : str</span>
-<span class="sd">        Directory for initial files for setup.</span>
-<span class="sd">    SRC_DIR : str</span>
-<span class="sd">        Source directory for reactonite codebase.</span>
-<span class="sd">    DEST_DIR : str</span>
-<span class="sd">        Destination directory for React codebase.</span>
-<span class="sd">    CONFIG_FILE_NAME : str</span>
-<span class="sd">        Config file name for config variables.</span>
-<span class="sd">    PROPS_MAP : dict</span>
-<span class="sd">        Mapping for HTML to React props</span>
+<span class="sd">    content : str</span>
+<span class="sd">        HTML Content</span>
+<span class="sd">    loc : str</span>
+<span class="sd">        Location where we have to save the HTML File</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">INIT_FILES_DIR</span> <span class="o">=</span> <span class="s1">&#39;init_src_dir&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">SRC_DIR</span> <span class="o">=</span> <span class="s1">&#39;src&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">DEST_DIR</span> <span class="o">=</span> <span class="s1">&#39;dist&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;config.json&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">PROPS_MAP</span> <span class="o">=</span> <span class="n">props_map</span></div>
+    <span class="n">html_front</span> <span class="o">=</span> <span class="s1">&#39;&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;/&gt;&lt;title&gt;The HTML5 Herald&lt;/title&gt;&lt;meta name=&quot;description&quot; content=&quot;The HTML5 Herald&quot;/&gt;&lt;meta name=&quot;author&quot; content=&quot;SitePoint&quot;/&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;./main.css&quot;/&gt;&lt;/head&gt;&lt;body&gt;&#39;</span>
+    <span class="n">html_back</span> <span class="o">=</span> <span class="s1">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">html_front</span> <span class="o">+</span> <span class="n">content</span> <span class="o">+</span> <span class="n">html_back</span>
+    <span class="n">text_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="n">text_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+    <span class="n">text_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="saveCss"><a class="viewcode-back" href="../../reactonite.html#reactonite.CreateHtmlCss.saveCss">[docs]</a><span class="k">def</span> <span class="nf">saveCss</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">loc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes body of the POST response from GrapesJS and saves CSS File</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    content : str</span>
+<span class="sd">        CSS Content</span>
+<span class="sd">    loc : str</span>
+<span class="sd">        Location where we have to save the CSS File</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">text_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s1">&#39;main.css&#39;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="n">text_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">text_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
 
            </div>
