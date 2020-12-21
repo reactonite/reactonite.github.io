@@ -1,8 +1,0 @@
-[submodule "dev"]
-	path = dev
-	url = https://github.com/reactonite/reactonite.github.io.git
-	branch = dev
-[submodule "v0.0.1-alpha"]
-	path = v0.0.1-alpha
-	url = https://github.com/reactonite/reactonite.github.io.git
-	branch = v0.0.1-alpha
