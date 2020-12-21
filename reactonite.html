@@ -865,10 +865,14 @@ directory, if not HTML file then get’s copied directly.</p>
 
 <dl class="py method">
 <dt id="reactonite.Transpiler.Transpiler.transpile_project">
-<code class="sig-name descname">transpile_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpile_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpile_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transpile_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">copy_static</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reactonite/Transpiler.html#Transpiler.transpile_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reactonite.Transpiler.Transpiler.transpile_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs initial checks like ensuring the source
 directories exist, and the source file is present.
-After that, copies non html files and transpiles the source.</p>
+After that, copies non html files and transpiles the source.
+:param copy_static: will copy non .html files if true, only .html files will be</p>
+<blockquote>
+<div><p>transpiled if false</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>RuntimeError</strong> – Raised source html file is missing.</p>

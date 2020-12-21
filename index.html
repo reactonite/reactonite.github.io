@@ -183,9 +183,8 @@ hence building a PWA, SPA ✨</p>
 <li><p>Transpile HTML code to React website</p></li>
 <li><p>Create PWAs and React applications as quickly as possible</p></li>
 <li><p>Act as a wrapper to NPM</p></li>
-<li><p>Allow importing of already created HTML file components</p></li>
 <li><p>Hot Reloading</p></li>
-<li><p>Support custom scss, styled-components, material icons etc.</p></li>
+<li><p>Support custom scss, js, css etc.</p></li>
 </ul>
 </div>
 <div class="section" id="getting-started">
@@ -206,34 +205,14 @@ software.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Clone the reactonite repository to local machine.</p></li>
+<ol class="arabic simple" start="0">
+<li><p>Install the package using pip</p></li>
 </ol>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/SDOS2020/Team_3_Reactonite.git
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ pip install reactonite
 </pre></div>
 </div>
 <ol class="arabic simple">
-<li><p>Setup virtual environment?</p></li>
-</ol>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> Team_3_Reactonite
-$ python -m venv env
-$ env<span class="se">\S</span>cripts<span class="se">\a</span>ctivate    <span class="c1"># For Windows</span>
-$ <span class="nb">source</span> env/bin/activate <span class="c1"># For Linux</span>
-</pre></div>
-</div>
-<p>&gt; Not necessary but recommended to keep your environment clean.</p>
-<ol class="arabic simple" start="3">
-<li><p>Install the package either using pip or python setup tools</p></li>
-</ol>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
-<span class="c1"># Use `develop` instead of `install` to get an editable build</span>
-
-<span class="c1"># Alternatively run</span>
-$ pip install .
-</pre></div>
-</div>
-<ol class="arabic simple" start="4">
-<li><p>You are good to go… 🎉</p></li>
+<li><p>You are good to go, yes it’s that simple… 🎉</p></li>
 </ol>
 </div>
 <div class="section" id="usage">
@@ -249,7 +228,8 @@ Usage: reactonite <span class="o">[</span>OPTIONS<span class="o">]</span> COMMAN
 Entry point <span class="k">for</span> Reactonite cli.
 
 Options:
---help  Show this message and exit.
+--version  Show the version and exit.
+--help     Show this message and exit.
 
 Commands:
 build              Command to get a static build of your app after...

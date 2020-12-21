@@ -484,7 +484,7 @@
 
     <span class="k">def</span> <span class="nf">__getReactAttrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates renamed attributes correspoding to React, and removes</span>
-<span class="sd">        inline style tags</span>
+<span class="sd">        inline style tags and tags starting with on like onclick etc.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -500,6 +500,8 @@
         <span class="n">final_attrs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">attrKey</span> <span class="o">==</span> <span class="s2">&quot;style&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">attrKey</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">attrKey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">:</span>
                 <span class="n">useKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props_map</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span>
@@ -888,10 +890,10 @@
 <span class="s2">        document.getElementById(&quot;root&quot;)</span>
 <span class="s2">        );</span>
 
-<span class="s2">        // If you want your app to work offline and load faster, you can change</span>
-<span class="s2">        // unregister() to register() below. Note this comes with some</span>
+<span class="s2">        // If you don&#39;t want your app to work offline, you can change</span>
+<span class="s2">        // register() to unregister() below. Note this comes with some</span>
 <span class="s2">        // pitfalls. Learn more about service workers: https://cra.link/PWA</span>
-<span class="s2">        serviceWorkerRegistration.unregister();</span>
+<span class="s2">        serviceWorkerRegistration.register();</span>
 
 <span class="s2">        // If you want to start measuring performance in your app, pass a</span>
 <span class="s2">        // function to log results (for example: reportWebVitals(console.log))</span>
@@ -1025,11 +1027,15 @@
                 <span class="n">filePathFromSrc</span><span class="p">,</span> <span class="n">filenameWithNoExtension</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Transpiler.transpile_project"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpile_project">[docs]</a>    <span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Transpiler.transpile_project"><a class="viewcode-back" href="../../reactonite.html#reactonite.Transpiler.Transpiler.transpile_project">[docs]</a>    <span class="k">def</span> <span class="nf">transpile_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">copy_static</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Runs initial checks like ensuring the source</span>
 <span class="sd">        directories exist, and the source file is present.</span>
 <span class="sd">        After that, copies non html files and transpiles the source.</span>
-
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        copy_static : bool</span>
+<span class="sd">            will copy non .html files if true, only .html files will be </span>
+<span class="sd">            transpiled if false</span>
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        RuntimeError</span>
@@ -1047,11 +1053,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transpiling files...&quot;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">+</span> <span class="s1">&#39;**/**&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
-                    <span class="n">filename</span>
-                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dir</span> <span class="o">+</span> <span class="s1">&#39;**/**&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;.html&quot;</span> <span class="ow">or</span> <span class="n">copy_static</span><span class="p">:</span>           
+                    <span class="bp">self</span><span class="o">.</span><span class="n">transpileFile</span><span class="p">(</span>
+                        <span class="n">filepath</span>
+                    <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__rebuildIndexJs</span><span class="p">()</span></div></div>
 </pre></div>
